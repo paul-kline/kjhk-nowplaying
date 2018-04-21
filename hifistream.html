@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>KJHK Now Playing</title>
+  <script defer src="https://use.fontawesome.com/releases/v5.0.10/js/all.js" integrity="sha384-slN8GvtUJGnv6ca26v8EzVaR9DC58QEwsIk9q1QXdCU8Yu8ck/tL/5szYlBbqmS+"
+    crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+  <!-- <link href="https://fonts.googleapis.com/css?family=Orbitron" rel="stylesheet"> -->
+  <!-- <link href="https://fonts.googleapis.com/css?family=Bungee+Inline" rel="stylesheet"> -->
+  <!-- <link href="https://fonts.googleapis.com/css?family=Anton" rel="stylesheet"> -->
+  <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
+  <!-- <script src="https://unpkg.com/vue"></script> -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.5.15/vue.min.js"> </script>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="./css.css">
+  <!-- css -->
+  <style>
+    #audioplayer:hover {
+      color: red;
+    }
+
+    .but {
+      font-size: 17vmin;
+      flex-basis: 1fr;
+      align-self: center;
+    }
+
+    .but:hover {
+      filter: blur(1px);
+      cursor: pointer;
+      transform: scale(1.1);
+    }
+
+    /* #pButton{
+    height:250px; 
+    width: 250px;
+    /* border: none;
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    background-position: center;
+    float:left;
+    outline:none;} */
+
+    /* .play{background: url('//kjhk.org/web/wp-content/uploads/2015/09/streamplay-300x300.png') ;}
+.pause{background: url('//kjhk.org/web/wp-content/uploads/2015/09/streampause-300x300.png') ;} */
+  </style>
+
+</head>
+
+<body class="mont w3-black w3-center">
+  <audio id="music" preload="all">
+    <source src="http://kjhkstream.org:8000/stream_high">
+  </audio>
+
+  <div class="now-playing">Now Playing on
+    <a id="kjtext" class="w3-text-red" href="https://www.kjhk.org" target="_blank">
+      KJHK
+    </a>
+  </div>
+
+
+  <div id="app">
+    <div class="container">
+      <div class="text-group">
+        <div v-if="songdat.song" class="song">''{{songdat.song}}'' </div>
+        <div v-if="songdat.song && songdat.artist" class="by w3-text-blue-grey">
+          by </div>
+        <div v-if="songdat.artist" class="artist">
+          <a v-bind:href="spotifyArtistUrl" v-bind:target="linkTarget" style="text-decoration: none">{{songdat.artist}} </a>
+        </div>
+        <div v-if="songdat.album" class="album-text">
+          <a v-bind:href="spotifyAlbumUrl" v-bind:target="linkTarget" style="text-decoration: none">[{{songdat.album}}] </a>
+        </div>
+        <div v-if="songdat.timestamp" class="">
+          <div v-if="true" id="timeholder" class="timestamp-font-size"> {{ calclocal }} </div>
+        </div>
+
+      </div>
+
+
+      <div id="audioplayer" style="align-self: center" class="w3-center tooltip">
+        <span class="tooltiptext">Refresh this page (ctrl-r) to resync stream.</span>
+        <div onclick="play()">
+          <i id="play" class="but far fa-play-circle"></i>
+          <i id="pause" class=" but far fa-stop-circle" style="display:none;"></i>
+        </div>
+      </div>
+
+
+      <div class="album-art">
+        <a v-if="albumurl.length > 0 " v-bind:href="spotifyAlbumUrl" target="_blank">
+          <img class="w3-image" v-bind:src="albumurl">
+        </a>
+        <a v-else class="kjhk-art" href="https://www.kjhk.org" target="_blank">
+          <img src="//kjhk.org/web/wp-content/uploads/2013/03/395331_10150705555581694_2013044703_n.jpg">
+        </a>
+      </div>
+    </div>
+  </div>
+  <div class="footer clock" id="clock1"> </div>
+  <script>
+    var music = document.getElementById('music'); // id for audio element
+    var duration; // Duration of audio clip
+    var pButton = document.getElementById('pButton'); // play button
+
+    //Play and Pause
+    function play() {
+      // start music
+      if (music.paused) {
+
+        music.play();
+        setTitle(app.songdat.song + " · " + app.songdat.artist);
+        // remove play, add pause
+        document.getElementById('play').style.display = "none";
+        document.getElementById('pause').style.display = "block";
+      } else { // STOP music
+        music.pause();
+        setTitle("KJHK Stream");
+        // remove pause, add play
+        document.getElementById('play').style.display = "block";
+        document.getElementById('pause').style.display = "none";
+
+      }
+    }
+
+    // Gets audio file duration
+    music.addEventListener("canplaythrough", function () {
+      duration = music.duration;
+    }, false);
+
+    //John's code:
+    //Volume controls:
+
+    //var myPlayer = document.getElementById("audioplayer");
+
+    function getVolume() {
+      alert(music.volume);
+    }
+
+    function increaseVolume() {
+      music.volume = 0.5;
+    }
+
+    function decreaseFullVolume() {
+      music.volume = 0.1;
+    } 
+  </script>
+  <!-- <script src="./bundle.js"></script> -->
+  <script src="./main.js"></script>
+</body>
+
+</html>

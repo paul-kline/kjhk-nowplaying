@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>KJHK Now Playing</title>
+  <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+  <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.5.15/vue.min.js"> </script>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <link rel="stylesheet" href="./css.css">
+  <!-- css -->
+  <style>
+  </style>
+
+</head>
+
+<body class="mont w3-black w3-center">
+  <div class="now-playing">Now Playing on
+    <a id="kjtext" class="w3-text-red" href="https://www.kjhk.org" target="_blank">
+      KJHK
+    </a>
+  </div>
+
+
+  <div id="app" class="container">
+    <div class="text-group">
+      <div v-if="songdat.song" class="song">
+        ''{{songdat.song}}''
+      </div>
+      <div v-if="songdat.song && songdat.artist" class="by w3-text-blue-grey">
+        by
+      </div>
+      <div v-if="songdat.artist" class="artist">
+        <a v-bind:href="spotifyArtistUrl" v-bind:target="linkTarget" style="text-decoration: none">{{songdat.artist}} </a>
+      </div>
+      <div v-if="songdat.album" class="album-text">
+        <a v-bind:href="spotifyAlbumUrl" v-bind:target="linkTarget" style="text-decoration: none">[{{songdat.album}}] </a>
+      </div>
+      <div v-if="songdat.timestamp" class="">
+        <div v-if="true" id="timeholder" class="timestamp-font-size"> {{ calclocal }} </div>
+      </div>
+
+    </div>
+    <div class="album-art">
+      <a v-if="albumurl.length > 0 " v-bind:href="spotifyAlbumUrl" target="_blank">
+        <img class="w3-image" v-bind:src="albumurl">
+      </a>
+      <a v-else class="kjhk-art" href="https://www.kjhk.org" target="_blank">
+        <img src="//kjhk.org/web/wp-content/uploads/2013/03/395331_10150705555581694_2013044703_n.jpg">
+      </a>
+    </div>
+  </div>
+  <div class="footer clock" id="clock1"> </div>
+  <script>
+// Title : album name
+// SearchIndex : Music
+// Artist : artist
+/*
+https://webservices.amazon.com/onca/xml?Service=AWSECommerceService&Operation=ItemSearch&AWSAccessKeyId=AKIAJHDOQQZS42G4W6AQ&AssociateTag=paulklinelabs-20&SearchIndex=Music&Artist=Bully&Title=Trying  
+*/
+  </script>
+  <!-- <script src="./bundle.js"></script> -->
+  <script src="./main.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,118 @@
+.mont {
+  font-family: "Montserrat", sans-serif;
+}
+
+body {
+  display: grid;
+
+  grid-template-rows: 12vh 80vh 8vh;
+  height: 100vh;
+  width: 100vw;
+}
+
+.now-playing {
+  /* background-color: aqua; */
+  /* align-self: start; */
+  font-size: 5vmin;
+  grid-column: 1/ -1;
+}
+
+.container {
+  display: flex;
+  justify-content: space-evenly;
+  justify-items: center;
+  align-items: center;
+  align-content: center;
+  /* background-color: firebrick; */
+  /* grid-template-columns: 1fr 1fr; */
+}
+.text-group {
+  flex-basis: 1fr;
+  /* align-self: center; */
+  /* background-color: greenyellow; */
+}
+
+.song {
+  font-style: italic;
+  font-size: 5vmin;
+}
+
+.by {
+  font-size: 3.5vmin;
+}
+
+.artist {
+  font-size: 5vmin;
+  font-weight: bold;
+}
+
+.artist:hover {
+  color: red;
+}
+
+.album-text {
+  font-size: 5vmin;
+}
+#kjtext {
+  font-weight: 900;
+  text-decoration: none;
+}
+#kjtext:hover {
+  filter: blur(1px);
+  font-size: 1.1em;
+  transform: scale(1.5);
+}
+.album-text:hover {
+  color: red;
+}
+.timestamp-font-size {
+  font-size: 4vmin;
+}
+img {
+  max-height: 80vh;
+  max-width: 100%;
+}
+.album-art {
+  flex-basis: 1fr;
+  /* background-color: cornflowerblue; */
+}
+
+.album-art:hover {
+  filter: blur(2px);
+  transform: scale(1.1);
+}
+.kjhk-art {
+  filter: invert(1);
+}
+.footer {
+  font-size: 4vmin;
+  grid-column: 1 / -1;
+  align-self: end;
+  /* background-color: darkblue; */
+}
+
+.tooltip {
+  position: relative;
+  display: inline-block;
+  border-bottom: 1px dotted black;
+}
+
+.tooltip .tooltiptext {
+  visibility: hidden;
+  width: 120px;
+  background-color: black;
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: 5px 0;
+
+  /* Position the tooltip */
+  position: absolute;
+  z-index: 1;
+  top: -50px;
+  /*left: 10px; */
+}
+
+.tooltip:hover .tooltiptext {
+  visibility: visible;
+}
