@@ -1,11 +1,44 @@
 let clocks = document.getElementsByClassName("clock");
 console.log("version", "1.2.1");
+
+let songStart = null;
+let predictedEnd = null;
+let gap = 0;
 function startTime() {
   Array.prototype.forEach.call(clocks, function(el) {
     el.innerHTML = new Date().toLocaleTimeString();
   });
 
+  //set progress, if present.
+  if (app && app.songdat.song_length) {
+    if (!songStart) {
+      songStart = fromUTC(app.songdat.timestamp);
+    }
+    if (!predictedEnd) {
+      predictedEnd = new Date(songStart);
+      predictedEnd.setMilliseconds(predictedEnd.getMilliseconds() + app.songdat.song_length);
+      gap = predictedEnd.getTime() - songStart.getTime();
+    }
+    const elapsedTime = new Date().getTime() - songStart.getTime();
+    const percent = Math.max(0, Math.min((elapsedTime / gap) * 100, 100));
+    app.progressObject.width = "" + percent + "%";
+  }
+
   setTimeout(startTime, 1000);
+}
+function fromUTC(str) {
+  const wrongDate = new Date(str);
+  return new Date(
+    Date.UTC(
+      wrongDate.getFullYear(),
+      wrongDate.getMonth(),
+      wrongDate.getDate(),
+      wrongDate.getHours(),
+      wrongDate.getMinutes(),
+      wrongDate.getSeconds(),
+      wrongDate.getMilliseconds()
+    )
+  );
 }
 
 startTime();
@@ -18,7 +51,10 @@ var app = new Vue({
     albumurl: "",
     spotifyAlbumUrl: "#",
     spotifyArtistUrl: "#",
-    linkTarget: ""
+    linkTarget: "",
+    progressObject: {
+      width: "0%"
+    }
   },
   computed: {
     calclocal: function() {
@@ -27,9 +63,10 @@ var app = new Vue({
       }
       console.log("here is songdat:", this.songdat);
       let d = new Date(this.songdat.timestamp.replace(" ", "T"));
-      return new Date(
-        d.getTime() - d.getTimezoneOffset() * 60000
-      ).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+      return new Date(d.getTime() - d.getTimezoneOffset() * 60000).toLocaleTimeString([], {
+        hour: "numeric",
+        minute: "2-digit"
+      });
     }
   },
   created() {
@@ -54,6 +91,11 @@ var app = new Vue({
           obj.songdat = json.data;
           setTitle(obj.songdat.song + " · " + obj.songdat.artist);
           console.log("updating song");
+          //reset progress bar;
+          songStart = null;
+          predictedEnd = null;
+          app.progressObject.width = "0%";
+
           console.log("calling with:", obj.songdat.artist, obj.songdat.album);
           document.getElementsByTagName;
           axios
@@ -74,8 +116,7 @@ var app = new Vue({
                 albuminfo = data.data.albums.items[0];
                 imageurl = albuminfo.images[0].url; //zero is biggest.
                 app.spotifyAlbumUrl = albuminfo.external_urls.spotify;
-                app.spotifyArtistUrl =
-                  albuminfo.artists[0].external_urls.spotify;
+                app.spotifyArtistUrl = albuminfo.artists[0].external_urls.spotify;
               } catch (e) {
                 console.log("no album art received:", e);
                 imageurl = "";
@@ -97,16 +138,8 @@ var app = new Vue({
 });
 
 function setTitle(str) {
-  document.getElementsByTagName("title")[0].innerHTML = replaceTag(str).replace(
-    "Â",
-    ""
-  );
-  console.log(
-    "str was",
-    str,
-    "title set to:",
-    replaceTag(str).replace("Â", "")
-  );
+  document.getElementsByTagName("title")[0].innerHTML = replaceTag(str).replace("Â", "");
+  console.log("str was", str, "title set to:", replaceTag(str).replace("Â", ""));
 }
 let tagsToReplace = {
   "&": "&amp;",
