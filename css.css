@@ -1,11 +1,93 @@
 .mont {
   font-family: "Montserrat", sans-serif;
 }
+:root {
+  --KJHK-color: red;
+}
+.text-kjhk {
+  color: var(--KJHK-color) !important;
+}
+.text-left {
+  text-align: left;
+}
+.bg-black {
+  background-color: black;
+}
+.bg-kjhk {
+  background-color: var(--KJHK-color);
+}
+.smaller-text {
+  font-size: 0.95rem;
+}
+a {
+  color: white;
+}
+a:hover {
+  color: var(--KJHK-color);
+}
+
+.flex-column {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  justify-content: space-between;
+  height: 100%;
+  max-height: 100vh;
+}
+/* Portrait */
+@media screen and (orientation: portrait) {
+  /* Portrait styles */
+  .flexer {
+    flex-shrink: 1;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    justify-content: space-around;
+    align-items: center;
+    max-height: 70vh;
+    height: 100%;
+  }
+  .item {
+    flex-grow: 1;
+    flex-shrink: 1;
+  }
+}
+.responsive-image {
+  max-width: 100% !important;
+  height: auto !important;
+  max-height: 100% !important;
+}
+/* Landscape */
+@media screen and (orientation: landscape) {
+  /* Landscape styles */
+  .flexer {
+    flex-shrink: 1;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+    width: 100%;
+    /* max-height: 60vh; */
+    /* height: 100%; */
+  }
+  .responsive-image {
+    width: auto !important;
+    height: auto !important;
+
+    max-height: 100% !important;
+  }
+
+  .item {
+    /* flex-grow: 1;
+    flex-shrink: 1; */
+    /* height: 100%; */
+  }
+}
 
 body {
   display: grid;
 
-  grid-template-rows: 12vh 80vh 8vh;
+  /* grid-template-rows: 12vh 80vh 8vh; */
   height: 100vh;
   width: 100vw;
 }
@@ -14,22 +96,7 @@ body {
   /* background-color: aqua; */
   /* align-self: start; */
   font-size: 5vmin;
-  grid-column: 1/ -1;
-}
-
-.container {
-  display: flex;
-  justify-content: space-evenly;
-  justify-items: center;
-  align-items: center;
-  align-content: center;
-  /* background-color: firebrick; */
-  /* grid-template-columns: 1fr 1fr; */
-}
-.text-group {
-  flex-basis: 1fr;
-  /* align-self: center; */
-  /* background-color: greenyellow; */
+  /* grid-column: 1/ -1; */
 }
 
 .song {
@@ -46,10 +113,6 @@ body {
   font-weight: bold;
 }
 
-.artist:hover {
-  color: red;
-}
-
 .album-text {
   font-size: 5vmin;
 }
@@ -62,32 +125,27 @@ body {
   font-size: 1.1em;
   transform: scale(1.5);
 }
-.album-text:hover {
-  color: red;
-}
+
 .timestamp-font-size {
   font-size: 4vmin;
 }
 img {
-  max-height: 80vh;
+  /* max-height: 80vh; */
+  /* max-height: 10%; */
   max-width: 100%;
 }
 .album-art {
-  flex-basis: 1fr;
+  /* flex-basis: 1fr; */
   /* background-color: cornflowerblue; */
 }
 
-.album-art:hover {
-  filter: blur(2px);
-  transform: scale(1.1);
-}
 .kjhk-art {
   filter: invert(1);
 }
 .footer {
   font-size: 4vmin;
-  grid-column: 1 / -1;
-  align-self: end;
+  /* grid-column: 1 / -1; */
+  /* align-self: end; */
   /* background-color: darkblue; */
 }
 

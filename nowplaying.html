@@ -2,7 +2,13 @@
 <html>
   <head>
     <title>KJHK Now Playing</title>
-    <!-- <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css" /> -->
+    <script
+      defer
+      src="https://use.fontawesome.com/releases/v5.0.10/js/all.js"
+      integrity="sha384-slN8GvtUJGnv6ca26v8EzVaR9DC58QEwsIk9q1QXdCU8Yu8ck/tL/5szYlBbqmS+"
+      crossorigin="anonymous"
+    ></script>
+
     <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet" />
     <link
       rel="stylesheet"
@@ -16,89 +22,111 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <link rel="stylesheet" href="./css.css" />
+    <link rel="stylesheet" href="./hover.css" />
+    <link rel="stylesheet" href="./playbutton.css" />
     <!-- css -->
-    <style>
-      :root {
-        --KJHK-color: red;
-      }
-      .text-kjhk {
-        color: var(--KJHK-color) !important;
-      }
-      .text-left {
-        text-align: left;
-      }
-      .bg-black {
-        background-color: black;
-      }
-      .smaller-text {
-        font-size: 0.95rem;
-      }
-      a {
-        color: white;
-      }
-      a:hover {
-        color: var(--KJHK-color);
-      }
-    </style>
+    <script>
+      let INCLUDE_PLAY_BUTTON = true;
+    </script>
   </head>
 
   <body class="mont bg-black mx-auto text-center text-white">
-    <div class="now-playing ">
-      Now Playing on
-      <a id="kjtext" class="text-kjhk" href="https://www.kjhk.org" target="_blank">
-        KJHK
-      </a>
+    <audio id="music" preload="all">
+      <source src="http://kjhkstream.org:8000/stream_high" />
+    </audio>
+    <div id="container" class="flex-column">
+      <div id="header-text" class="now-playing mb-0 text-muted">
+        <div>
+          Now Playing on
+          <a id="kjtext" class="text-kjhk" href="https://www.kjhk.org" target="_blank">
+            KJHK
+          </a>
+        </div>
+        <hr class="bg-kjhk mt-0" />
+      </div>
+      <!-- <div class="" style="width: 100%; height:80%"> -->
+      <div id="app" class="flexer">
+        <div class="m-1 item" style="min-width: 30%;">
+          <div v-if="songdat.song" class="song">''{{ songdat.song }}''</div>
+          <div v-if="songdat.song && songdat.artist" class="by text-muted">
+            by
+          </div>
+          <div v-if="songdat.artist" class="artist">
+            <a
+              v-bind:href="spotifyArtistUrl"
+              v-bind:target="linkTarget"
+              style="text-decoration: none"
+              data-toggle="tooltip"
+              data-placement="right"
+              v-bind:title="artistTooltip"
+              >{{ songdat.artist }}
+            </a>
+          </div>
+          <div v-if="songdat.album" class="album-text">
+            <a
+              v-bind:href="spotifyAlbumUrl"
+              v-bind:target="linkTarget"
+              style="text-decoration: none !important"
+              data-toggle="tooltip"
+              data-placement="right"
+              v-bind:title="albumTooltip"
+              >[{{ songdat.album }}]
+            </a>
+          </div>
+          <div v-if="songdat.timestamp" class="text-left ">
+            <div v-if="true" id="timeholder" class="smaller-text">{{ calclocal }}</div>
+          </div>
+          <div class="progress" style="height: 3px;">
+            <div
+              class="progress-bar"
+              role="progressbar"
+              aria-valuenow="0"
+              aria-valuemin="0"
+              v-bind:style="progressObject"
+              aria-valuemax="100"
+            ></div>
+          </div>
+        </div>
+        <div
+          v-if="INCLUDE_PLAY_BUTTON"
+          class="item"
+          id="audioplayer"
+          style="align-self: center"
+          data-toggle="tooltip"
+          data-placement="top"
+          title="Refresh this page (ctrl-r) to resync stream."
+        >
+          <div onclick="play()">
+            <i id="play" class="but far fa-play-circle"></i>
+            <i id="pause" class=" but far fa-stop-circle" style="display:none;"></i>
+          </div>
+        </div>
+        <div class="content item" style="height:100%">
+          <a v-if="albumurl.length > 0 " v-bind:href="spotifyAlbumUrl" target="_blank" style="height:100%">
+            <div class="content-overlay"></div>
+            <img class="content-image responsive-image img-fluid" v-bind:src="albumurl" />
+            <div class="content-details fadeIn-top">
+              <h3>Open album in spotify</h3>
+              <p>[{{ songdat.album }}]</p>
+            </div>
+          </a>
+          <a v-else href="https://www.kjhk.org" target="_blank">
+            <div class="content-overlay"></div>
+            <img
+              class="kjhk-art img-fluid"
+              src="//kjhk.org/web/wp-content/uploads/2013/03/395331_10150705555581694_2013044703_n.jpg"
+            />
+            <div class="content-details fadeIn-bottom ">
+              <h3 class="text-kjhk">Go to KJHK.org</h3>
+              <p>(You know you'd like it.)</p>
+            </div>
+          </a>
+        </div>
+      </div>
+      <!-- </div> -->
+      <div class="footer clock text-muted" id="clock1"></div>
     </div>
 
-    <div id="app" class="container">
-      <div class="text-group">
-        <div v-if="songdat.song" class="song">''{{ songdat.song }}''</div>
-        <div v-if="songdat.song && songdat.artist" class="by w3-text-blue-grey">
-          by
-        </div>
-        <div v-if="songdat.artist" class="artist">
-          <a v-bind:href="spotifyArtistUrl" v-bind:target="linkTarget" style="text-decoration: none"
-            >{{ songdat.artist }}
-          </a>
-        </div>
-        <div v-if="songdat.album" class="album-text">
-          <a v-bind:href="spotifyAlbumUrl" v-bind:target="linkTarget" style="text-decoration: none !important"
-            >[{{ songdat.album }}]
-          </a>
-        </div>
-        <div v-if="songdat.timestamp" class="text-left ">
-          <div v-if="true" id="timeholder" class="smaller-text">{{ calclocal }}</div>
-        </div>
-        <div class="progress">
-          <div
-            class="progress-bar"
-            role="progressbar"
-            aria-valuenow="0"
-            aria-valuemin="0"
-            v-bind:style="progressObject"
-            aria-valuemax="100"
-          ></div>
-        </div>
-      </div>
-      <div class="album-art">
-        <a v-if="albumurl.length > 0 " v-bind:href="spotifyAlbumUrl" target="_blank">
-          <img class="w3-image" v-bind:src="albumurl" />
-        </a>
-        <a v-else class="kjhk-art" href="https://www.kjhk.org" target="_blank">
-          <img src="//kjhk.org/web/wp-content/uploads/2013/03/395331_10150705555581694_2013044703_n.jpg" />
-        </a>
-      </div>
-    </div>
-    <div class="footer clock" id="clock1"></div>
-    <script>
-      // Title : album name
-      // SearchIndex : Music
-      // Artist : artist
-      /*
-https://webservices.amazon.com/onca/xml?Service=AWSECommerceService&Operation=ItemSearch&AWSAccessKeyId=AKIAJHDOQQZS42G4W6AQ&AssociateTag=paulklinelabs-20&SearchIndex=Music&Artist=Bully&Title=Trying  
-*/
-    </script>
-    <!-- <script src="./bundle.js"></script> -->
     <script
       src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
       integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
@@ -115,5 +143,7 @@ https://webservices.amazon.com/onca/xml?Service=AWSECommerceService&Operation=It
       crossorigin="anonymous"
     ></script>
     <script src="./main.js"></script>
+
+    <script src="./musicplayer.js"></script>
   </body>
 </html>

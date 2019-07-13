@@ -1,0 +1,15 @@
+#audioplayer:hover {
+  color: red;
+}
+
+.but {
+  font-size: 17vmin;
+  flex-basis: 1fr;
+  align-self: center;
+}
+
+.but:hover {
+  filter: blur(1px);
+  cursor: pointer;
+  transform: scale(1.1);
+}
