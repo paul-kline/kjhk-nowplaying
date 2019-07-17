@@ -25,6 +25,9 @@ a {
 a:hover {
   color: var(--KJHK-color);
 }
+.white-hover {
+  color: white !important;
+}
 
 .flex-column {
   display: flex;

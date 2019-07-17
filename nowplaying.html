@@ -59,6 +59,7 @@
               data-toggle="tooltip"
               data-placement="right"
               v-bind:title="artistTooltip"
+              v-bind:class="{ 'white-hover': !hasSpotify }"
               >{{ songdat.artist }}
             </a>
           </div>
@@ -70,6 +71,7 @@
               data-toggle="tooltip"
               data-placement="right"
               v-bind:title="albumTooltip"
+              v-bind:class="{ 'white-hover': !hasSpotify }"
               >[{{ songdat.album }}]
             </a>
           </div>

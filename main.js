@@ -84,6 +84,9 @@ var app = new Vue({
     },
     albumTooltip: function() {
       return ""; //"View Album on Spotify (if available)";
+    },
+    hasSpotify: function() {
+      return this.spotifyArtistUrl.length > 1;
     }
   },
   mounted() {
