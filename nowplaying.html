@@ -31,7 +31,7 @@
   </head>
 
   <body class="mont bg-black mx-auto text-center text-white">
-    <audio id="music" preload="all">
+    <audio id="music" preload="metadata">
       <source src="http://kjhkstream.org:8000/stream_high" />
     </audio>
     <div id="container" class="flex-column">
@@ -87,24 +87,20 @@
             ></div>
           </div>
         </div>
-        <div
-          v-if="INCLUDE_PLAY_BUTTON"
-          class="item"
-          id="audioplayer"
-          style="align-self: center"
-          data-toggle="tooltip"
-          data-placement="top"
-          title="Refresh this page (ctrl-r) to resync stream."
-        >
+        <div v-if="INCLUDE_PLAY_BUTTON" class="item" id="audioplayer" style="align-self: center">
           <div onclick="play()">
             <i id="play" class="but far fa-play-circle"></i>
             <i id="pause" class=" but far fa-stop-circle" style="display:none;"></i>
           </div>
         </div>
-        <div class="content item" style="height:100%">
+        <div class="content item stretcher">
           <a v-if="albumurl.length > 0 " v-bind:href="spotifyAlbumUrl" target="_blank" style="height:100%">
             <div class="content-overlay"></div>
-            <img class="content-image responsive-image img-fluid" v-bind:src="albumurl" />
+            <img
+              class="content-image  responsive-image flex-image"
+              v-bind:src="albumurl"
+              style="height:auto; max-width: 100%; "
+            />
             <div class="content-details fadeIn-top">
               <h3>Open album in spotify</h3>
               <p>[{{ songdat.album }}]</p>
@@ -113,7 +109,7 @@
           <a v-else href="https://www.kjhk.org" target="_blank">
             <div class="content-overlay"></div>
             <img
-              class="kjhk-art img-fluid"
+              class="kjhk-art responsive-image"
               src="//kjhk.org/web/wp-content/uploads/2013/03/395331_10150705555581694_2013044703_n.jpg"
             />
             <div class="content-details fadeIn-bottom ">

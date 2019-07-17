@@ -4,7 +4,8 @@ console.log("version", "1.2.1");
 let songStart = null;
 let predictedEnd = null;
 let gap = 0;
-let DELAY = 5; //seconds.
+let DELAY = 4; //seconds.
+
 function startTime() {
   Array.prototype.forEach.call(clocks, function(el) {
     el.innerHTML = new Date().toLocaleTimeString();
@@ -27,6 +28,7 @@ function startTime() {
 
   setTimeout(startTime, 1000);
 }
+
 function fromUTC(str) {
   const wrongDate = new Date(str);
   return new Date(
@@ -55,7 +57,12 @@ var app = new Vue({
     linkTarget: "",
     progressObject: {
       width: "0%"
-    }
+    },
+    checkSongDelay: 10000,
+    defaultCheckSongDelay: 10000,
+    frequentSongDelay: 3000,
+    frequentSongCheckAttempts: 0,
+    maxFrequentSongCheckAttempts: 4
   },
   computed: {
     calclocal: function() {
@@ -69,14 +76,14 @@ var app = new Vue({
         minute: "2-digit"
       });
     },
-    showStatus: function() {
-      return this.songdat.song_length && predictedEnd && predictedEnd.getTime() + DELAY <= new Date().getTime();
-    },
+    // showStatus: function() {
+    //   return this.songdat.song_length && predictedEnd && predictedEnd.getTime() + DELAY <= new Date().getTime();
+    // },
     artistTooltip: function() {
-      return this.albumurl ? "View Artist on Spotify" : "";
+      return ""; //"View Artist on Spotify (if available)";
     },
     albumTooltip: function() {
-      return this.albumurl ? "View Album on Spotify" : "";
+      return ""; //"View Album on Spotify (if available)";
     }
   },
   mounted() {
@@ -96,24 +103,44 @@ var app = new Vue({
     //update every 10 seconds:
     recur_updateSong(this);
 
-    function recur_updateSong(obj) {
-      updateSong(obj);
+    async function recur_updateSong(obj) {
+      await updateSong(obj);
+      console.log("will check song data again in:", obj.checkSongDelay / 1000, "seconds");
       setTimeout(() => {
         recur_updateSong(obj);
-      }, 10000);
+      }, obj.checkSongDelay);
     }
     async function updateSong(obj) {
+      console.log("checking for new song info");
       const songdata = await getNowPlaying();
       if (obj.songdat.timestamp == songdata.timestamp) {
+        console.log("song data is still the same");
+        //song is still the same? That is unexpected.
+        //if the song had a length, we scheduled the next lookup nad found nothing new.
+        //this could be because the DJ has started playing manually and not logged anything.
+        //if we still find nothing after checking again a few times, default back to normal time.
+        if (obj.songdat.song_length) {
+          if (obj.frequentSongCheckAttempts < obj.maxFrequentSongCheckAttempts) {
+            obj.frequentSongCheckAttempts++;
+            obj.checkSongDelay = obj.frequentSongDelay;
+          } else {
+            //we have checked frequntly too many times!
+            obj.checkSongDelay = obj.defaultCheckSongDelay;
+          }
+        } else {
+          //if no song length is available and the song still hasn't changed...
+          obj.checkSongDelay = obj.defaultCheckSongDelay;
+        }
         return; // nothing to do!
       }
-      //NEW SONG INFO!!!
+      //NEW SONG INFO!!!-----------------------------------------
+      obj.frequentSongCheckAttempts = 0;
       obj.songdat = songdata;
       setTitle(obj.songdat.song + " - " + obj.songdat.artist);
       console.log("updating song");
       //reset progress bar;
       resetProgressBar();
-      console.log("calling with:", obj.songdat.artist, obj.songdat.album);
+      console.log("calling album art search with:", obj.songdat.artist, obj.songdat.album);
 
       let albumArtData = await getAlbumArtData(obj.songdat.artist, obj.songdat.album);
       // let albumArtData = await getAlbumArtData("Silversun Pickups", "Widows Weeds");
@@ -126,6 +153,7 @@ var app = new Vue({
         imageurl = albuminfo.images[0].url; //zero is biggest.
         app.spotifyAlbumUrl = albuminfo.external_urls.spotify;
         app.spotifyArtistUrl = albuminfo.artists[0].external_urls.spotify;
+        $('[data-toggle="tooltip"]').tooltip(); //reset tooltips.
       };
       try {
         attempt();
@@ -152,7 +180,7 @@ var app = new Vue({
           //see if it contains apostrophies. IDK why spotify sometiems has a problem with that?
 
           //see if it's the clean/edited version.
-          const matches = albumtext.match(/[\[\(]?clean[\]\)]?|[\[\(]?edited[\[\(]?|[\[\(]?ep[\]\(]?|'/g);
+          const matches = albumtext.match(/[\[\(]?clean[\]\)]?|[\[\(]?edited[\[\(]?|[\[\(]?ep[\]\)]?/g);
           if (matches) {
             matches.forEach(m => {
               albumtext = albumtext.replace(m, "");
@@ -174,6 +202,16 @@ var app = new Vue({
         }
       }
       app.albumurl = imageurl;
+      //lastly, set the next song check delay.
+      if (obj.songdat.song_length) {
+        const endTime = fromUTC(obj.songdat.timestamp);
+        endTime.setMilliseconds(endTime.getMilliseconds() + obj.songdat.song_length);
+        obj.checkSongDelay = endTime.getTime() - Date.now() + 900 + Math.random() * 500; //random so server isn't bombarded at exact same time idk.
+        console.log("song length found in new song. setting checksongdelay to ", obj.checkSongDelay / 1000, "seconds");
+      } else {
+        //the new song does not have a length! I guess just check every 10 seconds.
+        obj.checkSongDelay = obj.defaultCheckSongDelay;
+      }
     }
   }
 });
@@ -202,10 +240,10 @@ async function getAlbumArtData(artist, album) {
   return result.data;
 }
 function setTitle(str) {
-  document.getElementsByTagName("title")[0].innerHTML = replaceTag(str)
-    .replace("Â", "")
-    .replace("Â", "");
-  console.log("str was", str, "title set to:", replaceTag(str).replace("Â", ""));
+  document.getElementsByTagName("title")[0].innerHTML = replaceTag(str);
+  // .replace("Â", "")
+  // .replace("Â", "");
+  // console.log("str was", str, "title set to:", replaceTag(str).replace("Â", ""));
 }
 let tagsToReplace = {
   "&": "&amp;",

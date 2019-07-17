@@ -3,13 +3,27 @@
   text-align: center;
   margin-bottom: 10px;
 }
+/* Portrait */
+@media screen and (orientation: portrait) {
+  /* Portrait styles */
+  .content {
+    position: relative;
+    /* max-width: 400px; */
+    /* margin: auto; */
+    /* overflow: hidden; */
+  }
+}
 
-.content {
-  position: relative;
-  max-width: 50%;
-  /* max-width: 400px; */
-  /* margin: auto; */
-  /* overflow: hidden; */
+/* Landscape */
+@media screen and (orientation: landscape) {
+  /* Landscape styles */
+  .content {
+    position: relative;
+    max-width: 50%;
+    /* max-width: 400px; */
+    /* margin: auto; */
+    /* overflow: hidden; */
+  }
 }
 
 .content .content-overlay {

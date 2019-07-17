@@ -6,8 +6,10 @@ var pButton = document.getElementById("pButton"); // play button
 function play() {
   // start music
   if (music.paused) {
+    console.log("music:", music);
+    music.load();
     music.play();
-    setTitle(app.songdat.song + " · " + app.songdat.artist);
+    setTitle(app.songdat.song + " - " + app.songdat.artist);
     // remove play, add pause
     document.getElementById("play").style.display = "none";
     document.getElementById("pause").style.display = "block";
