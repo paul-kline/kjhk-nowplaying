@@ -145,7 +145,19 @@ var app = new Vue({
       resetProgressBar();
       console.log("calling album art search with:", obj.songdat.artist, obj.songdat.album);
 
+      const giverUpper = e => {
+        console.log("no album art received:", e);
+        imageurl = "";
+        app.spotifyAlbumUrl = "#";
+        app.spotifyArtistUrl = "#";
+        app.linkTarget = "";
+      };
+
       let albumArtData = await getAlbumArtData(obj.songdat.artist, obj.songdat.album);
+      if (albumArtData.error) {
+        console.log("there was an error getting the album art for", obj.songdat.artist, obj.songdat.album);
+        giverUpper(albumArtData.error);
+      }
       // let albumArtData = await getAlbumArtData("Silversun Pickups", "Widows Weeds");
       let albuminfo;
       let imageurl;
@@ -162,10 +174,7 @@ var app = new Vue({
         attempt();
       } catch (e) {
         console.log("no album art received:", e);
-        imageurl = "";
-        app.spotifyAlbumUrl = "#";
-        app.spotifyArtistUrl = "#";
-        app.linkTarget = "";
+        giverUpper(e);
 
         //see if you can fix it.
         let albumtext = obj.songdat.album.trim().toLowerCase();
@@ -224,7 +233,15 @@ function resetProgressBar() {
   app.progressObject.width = "0%";
 }
 async function getNowPlaying() {
-  let response = await axios.get("https://kjhk.org/nowplaying.php");
+  let response = await axios.get("https://kjhk.org/nowplaying.php").catch(e => {
+    return { error: e };
+  });
+  if (response.error) {
+    console.log("error getting info from kjhk.org/nowplaying.php");
+    await waitSeconds(10);
+    console.log("waited 10 seconds. trying again to fetch song info");
+    return getNowPlaying();
+  }
   let answer = response.data;
   if (response.data instanceof Array) {
     answer = response.data[0];
@@ -232,15 +249,43 @@ async function getNowPlaying() {
   // console.log(answer);
   return answer;
 }
-async function getAlbumArtData(artist, album) {
-  const result = await axios.get("http://kjhkstream.org:3210/albumart", {
-    params: {
-      artist: artist,
-      album: album
-    }
+async function waitSeconds(seconds) {
+  return new Promise((resolve, reject) => {
+    setTimeout(resolve, seconds * 1000);
   });
+}
+async function getAlbumArtData(artist, album) {
+  const fetcher = () =>
+    axios.get("http://kjhkstream.org:3210/albumart", {
+      params: {
+        artist: artist,
+        album: album
+      }
+    });
+  const result = await fetcher()
+    .then(response => response.data)
+    .catch(er => {
+      //somthing went wrong try one more time before failing
+      return new Promise((resolve, reject) => {
+        console.info("error fetching album art. trying a second time after a short delay.");
+        setTimeout(() => {
+          console.info("second attempt at getting album art after delay.");
+          const r = fetcher()
+            .then(x => x.data)
+            .catch(e => {
+              return { error: e };
+            });
+          if (r.error) {
+            reject(r);
+          } else {
+            resolve(r);
+          }
+        }, 10000);
+      });
+    });
+
   console.log("result is", result);
-  return result.data;
+  return result;
 }
 function setTitle(str) {
   document.getElementsByTagName("title")[0].innerHTML = replaceTag(str);
